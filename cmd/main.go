@@ -27,6 +27,8 @@ func main() {
 	router := gin.Default()
 
 	router.POST("/signup",authHandler.SignupHandler)
+	router.POST("/login",authHandler.LoginHandler)
+	
 
 	router.Run(":8000")
 }
