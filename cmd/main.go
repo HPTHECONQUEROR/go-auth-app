@@ -12,4 +12,6 @@ func main() {
 	fmt.Println("Server Running on the port:", cfg.Port)
 	// fmt.Println("DB Host:", cfg.DBHost)
 	// fmt.Println("JWT Secret Key:", cfg.JWTSecret)
+	db.RunMigrations()
+	fmt.Println("Migrations are done")
 }
