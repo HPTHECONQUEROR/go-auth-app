@@ -7,8 +7,9 @@ import (
 	"go-auth-app/internal/delivery"
 	"go-auth-app/internal/repository"
 	"go-auth-app/internal/usecase"
-	"github.com/gin-gonic/gin"
+	"net/http"
 
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -28,7 +29,15 @@ func main() {
 
 	router.POST("/signup",authHandler.SignupHandler)
 	router.POST("/login",authHandler.LoginHandler)
-	
+	router.GET("/protected", delivery.AuthMiddleware(), func(c *gin.Context) {
+		userID := c.GetInt("user_id")
+		email := c.GetString("email")
+		c.JSON(http.StatusOK, gin.H{
+			"message":"Protected Data",
+			"user_id":userID,
+			"email":email,
+		})
+	})
 
 	router.Run(":8000")
 }
