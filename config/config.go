@@ -32,7 +32,7 @@ func LoadConfig() *Config{
 		DBPassword: os.Getenv("DB_PASSWORD"),
 		DBName: os.Getenv("DB_NAME"),
 		DBSSLMode: os.Getenv("DB_SSLMODE"),
-		JWTSecret: os.Getenv("JWTSECRET"),
+		JWTSecret: os.Getenv("JWT_SECRET"),
 		JWTExpiration: os.Getenv("JWT_EXPIRATION_HOURS"),
 
 	}
