@@ -1,10 +1,13 @@
-package main 
+package main
 
-import "fmt"
-
-//Just for the initial commit! nothing much!
+import (
+	"fmt"
+	"go-auth-app/config"
+)
 
 func main() {
-	fmt.Println("Hello world!")
+	cfg := config.LoadConfig()
+	fmt.Println("Server Running on the port:", cfg.Port)
+	fmt.Println("DB Host:", cfg.DBHost)
+	// fmt.Println("JWT Secret Key:", cfg.JWTSecret)
 }
-
