@@ -41,8 +41,12 @@ func (uc *AuthUsecase) Signup(ctx context.Context, user *domain.User) error {
 }
 
 //Login-authenticates a user and returns a JWT token
-func (us *AuthUsecase) Login(ctx context.Context, email,password string)(string,error){
-	user, err := repository.NewUserRepository().GetByEmail(ctx,email) 
+func (uc *AuthUsecase) Login(ctx context.Context, email,password string)(string,error){
+	user, err := uc.UserRepo.GetByEmail(ctx, email)
+	
+	
+
+
 	if err != nil{
 		return "", errors.New("invalid Email or password")
 	}
