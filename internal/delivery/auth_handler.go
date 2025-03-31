@@ -61,3 +61,14 @@ func (h *AuthHandler) LoginHandler(c *gin.Context){
 	c.JSON(http.StatusOK, gin.H{"token": token})
 
 }
+
+
+func(h *AuthHandler) ProtectedHandler(c *gin.Context){
+    userID := c.GetInt("user_id")
+    email := c.GetString("email")
+    c.JSON(http.StatusOK, gin.H{
+        "message":"Protected Data",
+        "user_id":userID,
+        "email":email,
+    })
+}
