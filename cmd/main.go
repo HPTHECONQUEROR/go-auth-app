@@ -12,23 +12,41 @@ import (
 )
 
 func main() {
-	//Load COnfig
+	// Load Config
 	config.LoadEnv()
 
-	//Initialize config
+	// Initialize config
 	cfg := config.LoadConfig()
 
-	//Initialise the DB
+	// Initialize the DB
 	db.ConnectDB(cfg)
 	defer db.CloseDB()
 
+	// Run database migrations
 	db.RunMigrations()
 
+	// Initialize repositories
 	userRepo := repository.NewUserRepository()
-	authUsecase := usecase.NewAuthUsecase(userRepo)  
-	authHandler := delivery.NewAuthHandler(authUsecase)  
+	chatRepo := repository.NewChatRepository()
 
+	// Initialize usecases
+	authUsecase := usecase.NewAuthUsecase(userRepo)
+	chatUsecase := usecase.NewChatUsecase(chatRepo, userRepo)
+
+	// Initialize handlers
+	authHandler := delivery.NewAuthHandler(authUsecase)
+	chatHandler := delivery.NewChatHandler(chatUsecase)
+	wsHandler := delivery.NewWebSocketHandler(chatUsecase)
+
+	// Initialize and configure router
 	router := gin.Default()
-	routes.SetupRoutes(router,authHandler)
-	router.Run(":8000")
+	
+	// Setup middleware
+	router.Use(delivery.ErrorHandlerMiddleware())
+	
+	// Setup routes
+	routes.SetupRoutes(router, authHandler, chatHandler, wsHandler)
+	
+	// Start server
+	router.Run(":" + cfg.Port)
 }
