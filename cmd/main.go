@@ -1,25 +1,27 @@
 package main
 
 import (
-	"fmt"
 	"go-auth-app/config"
 	"go-auth-app/db"
 	"go-auth-app/internal/delivery"
 	"go-auth-app/internal/repository"
 	"go-auth-app/internal/usecase"
 	"net/http"
-
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	//Load COnfig
+	config.LoadEnv()
+
+	//Initialize config
 	cfg := config.LoadConfig()
+
+	//Initialise the DB
 	db.ConnectDB(cfg)
-	fmt.Println("Server Running on the port:", cfg.Port)
-	// fmt.Println("DB Host:", cfg.DBHost)
-	// fmt.Println("JWT Secret Key:", cfg.JWTSecret)
+	defer db.CloseDB()
+
 	db.RunMigrations()
-	// fmt.Println("Migrations are done")
 
 	userRepo := repository.NewUserRepository()
 	authUsecase := usecase.NewAuthUsecase(*userRepo)  

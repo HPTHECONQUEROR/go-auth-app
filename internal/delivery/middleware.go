@@ -8,6 +8,30 @@ import (
 	"go-auth-app/pkg"
 )
 
+// ErrorResponse function defines the standard error response structure
+
+type ErrorResponse struct{
+	Message string `json:"message"`
+}
+
+
+//ErrorHandlerMiddleware Fucntion handles error globally
+
+func ErrorHandlerMiddleware() gin.HandlerFunc{
+	return func (c *gin.Context)  {
+		c.Next()
+
+		if len(c.Errors) > 0{
+			err := c.Errors.Last()
+			c.JSON(http.StatusInternalServerError, ErrorResponse{Message: err.Error()})
+			c.Abort()
+		}
+		
+	}
+}
+
+
+
 //AuthMiddleware Function validates the JWT token and extracts user information
 
 func AuthMiddleware() gin.HandlerFunc{

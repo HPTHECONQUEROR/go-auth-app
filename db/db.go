@@ -33,3 +33,10 @@ func ConnectDB(cfg *config.Config){
 
 	log.Println("Connnected to Postgresql!")
 }
+
+func CloseDB(){
+	if DB != nil{
+		DB.Close()
+		log.Println("Database connection closed!")
+	}
+}

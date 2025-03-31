@@ -18,6 +18,20 @@ type Config struct{
 	JWTExpiration string
 }
 
+func LoadEnv(){
+	err := godotenv.Load()
+	if err != nil{
+		log.Println("Warning: No .env file found!")
+	}
+}
+
+func Getenv(key, fallback string) string{
+	if vallue, exists := os.LookupEnv(key); exists{
+		return vallue
+	}
+	return fallback
+}
+
 func LoadConfig() *Config{
 	err:=godotenv.Load()
 	if err != nil{
