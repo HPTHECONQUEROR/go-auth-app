@@ -43,7 +43,6 @@ func (uc *ChatUsecase) SendMessage(ctx context.Context, senderID int, receiverID
 		SenderID:   senderID,
 		ReceiverID: receiverID,
 		Content:    content,
-		Read:       false,
 	}
 
 	// Save message to database
@@ -102,21 +101,4 @@ func (uc *ChatUsecase) GetUserConversations(ctx context.Context, userID int) ([]
 	}
 
 	return conversations, nil
-}
-
-// MarkMessageAsRead marks a message as read
-func (uc *ChatUsecase) MarkMessageAsRead(ctx context.Context, messageID int, userID int) error {
-	// Get the message
-	message, err := uc.ChatRepo.GetMessageByID(ctx, messageID)
-	if err != nil {
-		return err
-	}
-
-	// Verify the user is the receiver of the message
-	if message.ReceiverID != userID {
-		return errors.New("unauthorized to mark this message as read")
-	}
-
-	// Mark as read
-	return uc.ChatRepo.MarkMessageAsRead(ctx, messageID)
 }

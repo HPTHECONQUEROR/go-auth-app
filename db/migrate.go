@@ -24,7 +24,6 @@ func RunMigrations() {
 		receiver_id INTEGER NOT NULL REFERENCES users(id),
 		content TEXT NOT NULL,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		read BOOLEAN DEFAULT FALSE,
 		CONSTRAINT different_users CHECK (sender_id != receiver_id)
 	);
 	`
@@ -36,7 +35,6 @@ func RunMigrations() {
 		user2_id INTEGER NOT NULL REFERENCES users(id),
 		last_message TEXT DEFAULT '',
 		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		CONSTRAINT different_users CHECK (user1_id != user2_id),
 		CONSTRAINT unique_conversation UNIQUE (user1_id, user2_id)
 	);

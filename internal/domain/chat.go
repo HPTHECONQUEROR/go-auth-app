@@ -7,12 +7,11 @@ import (
 
 // Message represents a chat message between users
 type Message struct {
-	ID        int       `json:"id"`
-	SenderID  int       `json:"sender_id"`
-	ReceiverID int      `json:"receiver_id"`
-	Content   string    `json:"content" binding:"required"`
-	CreatedAt time.Time `json:"created_at"`
-	Read      bool      `json:"read"`
+	ID         int       `json:"id"`
+	SenderID   int       `json:"sender_id"`
+	ReceiverID int       `json:"receiver_id"`
+	Content    string    `json:"content"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 // Conversation represents a chat conversation between two users
@@ -22,7 +21,6 @@ type Conversation struct {
 	User2ID     int       `json:"user2_id"`
 	LastMessage string    `json:"last_message"`
 	UpdatedAt   time.Time `json:"updated_at"`
-	CreatedAt   time.Time `json:"created_at"`
 }
 
 // MessageRequest is used for receiving message data from clients
@@ -35,9 +33,6 @@ type MessageRequest struct {
 func ValidateMessage(content string) error {
 	if content == "" {
 		return errors.New("message content cannot be empty")
-	}
-	if len(content) > 1000 {
-		return errors.New("message content is too long (max 1000 characters)")
 	}
 	return nil
 }

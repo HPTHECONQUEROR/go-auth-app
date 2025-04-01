@@ -41,12 +41,14 @@ func main() {
 	// Initialize and configure router
 	router := gin.Default()
 	
-	// Setup middleware
-	router.Use(delivery.ErrorHandlerMiddleware())
-	
 	// Setup routes
 	routes.SetupRoutes(router, authHandler, chatHandler, wsHandler)
 	
 	// Start server
 	router.Run(":" + cfg.Port)
 }
+
+
+
+Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzcjFAZW1haWwuY29tIiwiZXhwIjoxNzQzNTcwNTI5LCJ1c2VyX2lkIjo2fQ.yCd2Gh6r3kXlZGePLxfNoU7y6tXtCul9zorCjhPpj6s
+Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzcjJAZW1haWwuY29tIiwiZXhwIjoxNzQzNTcwNTMyLCJ1c2VyX2lkIjo3fQ.Xdl2JwmGcdLuDiAVAYk8zTSr5iJCfCJtQsSDrSQiN00

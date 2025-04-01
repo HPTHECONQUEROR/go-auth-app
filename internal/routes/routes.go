@@ -27,9 +27,6 @@ func SetupRoutes(router *gin.Engine, authHandler *delivery.AuthHandler, chatHand
 		// Get all user's conversations
 		chat.GET("/conversations", chatHandler.GetUserConversationsHandler)
 		
-		// Mark a message as read
-		chat.PUT("/messages/:message_id/read", chatHandler.MarkMessageAsReadHandler)
-		
 		// WebSocket endpoint for real-time chat
 		chat.GET("/ws", wsHandler.HandleWebSocket)
 	}

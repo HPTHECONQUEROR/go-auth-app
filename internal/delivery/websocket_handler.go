@@ -33,7 +33,7 @@ func NewWebSocketHandler(chatUsecase *usecase.ChatUsecase) *WebSocketHandler {
 		upgrader: websocket.Upgrader{
 			ReadBufferSize:  1024,
 			WriteBufferSize: 1024,
-			// Allow all origins for development. In production, this should be restricted.
+			// Allow all origins for development
 			CheckOrigin: func(r *http.Request) bool {
 				return true
 			},
@@ -139,13 +139,8 @@ func (h *WebSocketHandler) handleClientConnection(client *pkg.Client) {
 		}
 
 		// Process message based on type
-		switch wsMessage.Type {
-		case "chat":
+		if wsMessage.Type == "chat" {
 			h.handleChatMessage(client, wsMessage.Data)
-		case "typing":
-			h.handleTypingNotification(client, wsMessage.Data)
-		case "read":
-			h.handleReadReceipt(client, wsMessage.Data)
 		}
 	}
 }
@@ -206,89 +201,4 @@ func (h *WebSocketHandler) handleChatMessage(client *pkg.Client, data json.RawMe
 		Data: messageData,
 	}
 	client.Send <- confirmMsg
-}
-
-// handleTypingNotification processes a typing notification
-func (h *WebSocketHandler) handleTypingNotification(client *pkg.Client, data json.RawMessage) {
-	var typingData struct {
-		ReceiverID int  `json:"receiver_id"`
-		IsTyping   bool `json:"is_typing"`
-	}
-	if err := json.Unmarshal(data, &typingData); err != nil {
-		log.Printf("Error parsing typing notification: %v", err)
-		return
-	}
-
-	// Forward typing notification to recipient if they're online
-	if recipient := h.getClient(typingData.ReceiverID); recipient != nil {
-		typingResponse := struct {
-			SenderID int  `json:"sender_id"`
-			IsTyping bool `json:"is_typing"`
-		}{
-			SenderID: client.ID,
-			IsTyping: typingData.IsTyping,
-		}
-		data, err := json.Marshal(typingResponse)
-		if err != nil {
-			log.Printf("Error marshaling typing notification: %v", err)
-			return
-		}
-		
-		wsMessage := pkg.WebSocketMessage{
-			Type: "typing",
-			Data: data,
-		}
-		recipient.Send <- wsMessage
-	}
-}
-
-// handleReadReceipt processes a read receipt
-func (h *WebSocketHandler) handleReadReceipt(client *pkg.Client, data json.RawMessage) {
-	var readData struct {
-		MessageID int `json:"message_id"`
-	}
-	if err := json.Unmarshal(data, &readData); err != nil {
-		log.Printf("Error parsing read receipt: %v", err)
-		return
-	}
-
-	// Mark message as read in database
-	err := h.ChatUsecase.MarkMessageAsRead(
-		context.Background(),
-		readData.MessageID,
-		client.ID,
-	)
-	if err != nil {
-		log.Printf("Error marking message as read: %v", err)
-		return
-	}
-
-	// Get the message to identify the sender
-	message, err := h.ChatUsecase.ChatRepo.GetMessageByID(context.Background(), readData.MessageID)
-	if err != nil {
-		log.Printf("Error getting message for read receipt: %v", err)
-		return
-	}
-
-	// Send read receipt to sender if they're online
-	if sender := h.getClient(message.SenderID); sender != nil {
-		readResponse := struct {
-			MessageID int `json:"message_id"`
-			ReaderID  int `json:"reader_id"`
-		}{
-			MessageID: readData.MessageID,
-			ReaderID:  client.ID,
-		}
-		data, err := json.Marshal(readResponse)
-		if err != nil {
-			log.Printf("Error marshaling read receipt: %v", err)
-			return
-		}
-		
-		wsMessage := pkg.WebSocketMessage{
-			Type: "read",
-			Data: data,
-		}
-		sender.Send <- wsMessage
-	}
 }
