@@ -39,7 +39,7 @@ func main() {
 	natsService := service.NewNATSService(natsClient)
 	
 	// Generate mock data for testing NATS
-	natsService.MockChatData()
+	// natsService.MockChatData()
 
 	// Initialize repositories
 	userRepo := repository.NewUserRepository()
