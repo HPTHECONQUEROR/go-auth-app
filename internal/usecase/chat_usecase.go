@@ -5,19 +5,27 @@ import (
 	"errors"
 	"go-auth-app/internal/domain"
 	"go-auth-app/internal/repository"
+	"go-auth-app/internal/service"
+	"log"
 )
 
 // ChatUsecase handles business logic for chat operations
 type ChatUsecase struct {
-	ChatRepo repository.ChatRepository
-	UserRepo repository.UserRepository
+	ChatRepo    repository.ChatRepository
+	UserRepo    repository.UserRepository
+	NatsService *service.NATSService
 }
 
 // NewChatUsecase creates a new instance of ChatUsecase
-func NewChatUsecase(chatRepo repository.ChatRepository, userRepo repository.UserRepository) *ChatUsecase {
+func NewChatUsecase(
+	chatRepo repository.ChatRepository,
+	userRepo repository.UserRepository,
+	natsService *service.NATSService,
+) *ChatUsecase {
 	return &ChatUsecase{
-		ChatRepo: chatRepo,
-		UserRepo: userRepo,
+		ChatRepo:    chatRepo,
+		UserRepo:    userRepo,
+		NatsService: natsService,
 	}
 }
 
@@ -60,6 +68,15 @@ func (uc *ChatUsecase) SendMessage(ctx context.Context, senderID int, receiverID
 	err = uc.ChatRepo.UpdateConversation(ctx, conversation.ID, content)
 	if err != nil {
 		return nil, err
+	}
+
+	// Publish message to NATS
+	if uc.NatsService != nil {
+		err = uc.NatsService.PublishChatMessage(message)
+		if err != nil {
+			// Log error but don't fail the operation
+			log.Printf("Failed to publish message to NATS: %v", err)
+		}
 	}
 
 	return message, nil

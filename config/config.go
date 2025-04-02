@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"strconv"
 	"github.com/joho/godotenv"
 )
 
@@ -16,6 +17,8 @@ type Config struct{
 	DBSSLMode string
 	JWTSecret string
 	JWTExpiration string
+	NatsURL string
+	NatsReconnect bool
 }
 
 func LoadEnv(){
@@ -26,29 +29,40 @@ func LoadEnv(){
 }
 
 func Getenv(key, fallback string) string{
-	if vallue, exists := os.LookupEnv(key); exists{
-		return vallue
+	if value, exists := os.LookupEnv(key); exists{
+		return value
+	}
+	return fallback
+}
+
+func GetenvBool(key string, fallback bool) bool {
+	if value, exists := os.LookupEnv(key); exists {
+		boolValue, err := strconv.ParseBool(value)
+		if err != nil {
+			return fallback
+		}
+		return boolValue
 	}
 	return fallback
 }
 
 func LoadConfig() *Config{
-	err:=godotenv.Load()
+	err := godotenv.Load()
 	if err != nil{
-		log.Fatal("Error Loading .env file")
+		log.Println("Warning: No .env file found, using environment variables")
 	}
 
 	return &Config{
-		Port: os.Getenv("PORT"),
-		DBHost: os.Getenv("DB_HOST"),
-		DBPort: os.Getenv("DB_PORT"),
-		DBUser: os.Getenv("DB_USER"),
-		DBPassword: os.Getenv("DB_PASSWORD"),
-		DBName: os.Getenv("DB_NAME"),
-		DBSSLMode: os.Getenv("DB_SSLMODE"),
-		JWTSecret: os.Getenv("JWT_SECRET"),
-		JWTExpiration: os.Getenv("JWT_EXPIRATION_HOURS"),
-
+		Port: Getenv("PORT", "8000"),
+		DBHost: Getenv("DB_HOST", "localhost"),
+		DBPort: Getenv("DB_PORT", "5432"),
+		DBUser: Getenv("DB_USER", "postgres"),
+		DBPassword: Getenv("DB_PASSWORD", "password"),
+		DBName: Getenv("DB_NAME", "go_auth"),
+		DBSSLMode: Getenv("DB_SSLMODE", "disable"),
+		JWTSecret: Getenv("JWT_SECRET", "default_jwt_secret_key"),
+		JWTExpiration: Getenv("JWT_EXPIRATION_HOURS", "24"),
+		NatsURL: Getenv("NATS_URL", "nats://localhost:4222"),
+		NatsReconnect: GetenvBool("NATS_RECONNECT", true),
 	}
-
 }

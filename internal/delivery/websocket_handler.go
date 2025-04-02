@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"go-auth-app/internal/domain"
+	"go-auth-app/internal/service"
 	"go-auth-app/internal/usecase"
 	"go-auth-app/pkg"
 	"log"
@@ -18,6 +19,7 @@ import (
 // WebSocketHandler handles WebSocket connections for real-time chat
 type WebSocketHandler struct {
 	ChatUsecase *usecase.ChatUsecase
+	NatsService *service.NATSService
 	// Track active connections
 	clients    map[int]*pkg.Client
 	clientsMux sync.RWMutex
@@ -26,9 +28,10 @@ type WebSocketHandler struct {
 }
 
 // NewWebSocketHandler creates a new instance of WebSocketHandler
-func NewWebSocketHandler(chatUsecase *usecase.ChatUsecase) *WebSocketHandler {
+func NewWebSocketHandler(chatUsecase *usecase.ChatUsecase, natsService *service.NATSService) *WebSocketHandler {
 	return &WebSocketHandler{
 		ChatUsecase: chatUsecase,
+		NatsService: natsService,
 		clients:     make(map[int]*pkg.Client),
 		upgrader: websocket.Upgrader{
 			ReadBufferSize:  1024,
@@ -74,6 +77,43 @@ func (h *WebSocketHandler) HandleWebSocket(c *gin.Context) {
 
 	// Register client
 	h.registerClient(client)
+
+	// Subscribe to NATS for this user
+	if h.NatsService != nil {
+		err = h.NatsService.SubscribeToUserMessages(userID, func(senderID, receiverID int, content string) {
+			// Only forward messages if they're intended for this user
+			if receiverID == userID {
+				// Convert to a domain message
+				message := &domain.Message{
+					SenderID:   senderID,
+					ReceiverID: receiverID,
+					Content:    content,
+					CreatedAt:  time.Now(),
+				}
+
+				// Marshal message to JSON for WebSocket transport
+				messageData, err := json.Marshal(message)
+				if err != nil {
+					log.Printf("Error marshaling NATS message: %v", err)
+					return
+				}
+
+				// Create WebSocket message
+				wsMessage := pkg.WebSocketMessage{
+					Type: "chat",
+					Data: messageData,
+				}
+
+				// Send to client
+				client.Send <- wsMessage
+				log.Printf("Forwarded NATS message to user %d", userID)
+			}
+		})
+
+		if err != nil {
+			log.Printf("Error subscribing to NATS for user %d: %v", userID, err)
+		}
+	}
 
 	// Start client handlers
 	go h.handleMessages(client)
@@ -165,7 +205,7 @@ func (h *WebSocketHandler) handleChatMessage(client *pkg.Client, data json.RawMe
 		return
 	}
 
-	// Store message in database
+	// Store message in database and publish to NATS
 	message, err := h.ChatUsecase.SendMessage(
 		context.Background(),
 		client.ID,
@@ -184,16 +224,6 @@ func (h *WebSocketHandler) handleChatMessage(client *pkg.Client, data json.RawMe
 		return
 	}
 
-	// Send message to recipient if they're online
-	if recipient := h.getClient(msgReq.ReceiverID); recipient != nil {
-		messageData, _ := json.Marshal(message)
-		wsMessage := pkg.WebSocketMessage{
-			Type: "chat",
-			Data: messageData,
-		}
-		recipient.Send <- wsMessage
-	}
-
 	// Send confirmation to sender
 	messageData, _ := json.Marshal(message)
 	confirmMsg := pkg.WebSocketMessage{
@@ -201,4 +231,7 @@ func (h *WebSocketHandler) handleChatMessage(client *pkg.Client, data json.RawMe
 		Data: messageData,
 	}
 	client.Send <- confirmMsg
+
+	// Note: We don't need to manually send to recipient here anymore
+	// The message will be delivered via NATS subscription
 }
