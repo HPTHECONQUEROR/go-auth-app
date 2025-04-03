@@ -55,7 +55,7 @@ func (h *ChatHandler) SendMessageHandler(c *gin.Context) {
 		req.ReceiverID,
 		req.Content,
 	)
-	
+
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -63,7 +63,7 @@ func (h *ChatHandler) SendMessageHandler(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Message sent successfully",
-		"data": message,
+		"data":    message,
 	})
 }
 

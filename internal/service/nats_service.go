@@ -107,7 +107,7 @@ func (s *NATSService) SubscribeToUserMessages(userID int, callback func(senderID
 	// Also subscribe to pattern where user is the smaller ID
 	subject = fmt.Sprintf("chat.private.%d.*", userID)
 	subKey = fmt.Sprintf("user_%d_smaller", userID)
-	
+
 	sub, err = s.Client.Subscribe(subject, messageCb)
 	if err != nil {
 		return fmt.Errorf("failed to subscribe to subject %s: %v", subject, err)
@@ -158,7 +158,7 @@ func (s *NATSService) UnsubscribeAll() {
 func (s *NATSService) MockChatData() {
 	// Generate some mock data for testing
 	log.Println("Publishing mock chat data to NATS...")
-	
+
 	mockMessages := []struct {
 		senderID   int
 		receiverID int
@@ -169,7 +169,7 @@ func (s *NATSService) MockChatData() {
 		{1, 2, "How are you doing?"},
 		{2, 1, "I'm doing great, thanks for asking!"},
 	}
-	
+
 	for _, msg := range mockMessages {
 		mockMessage := &domain.Message{
 			ID:         0, // Will be ignored for mock
@@ -178,7 +178,7 @@ func (s *NATSService) MockChatData() {
 			Content:    msg.content,
 			CreatedAt:  time.Now(),
 		}
-		
+
 		if err := s.PublishChatMessage(mockMessage); err != nil {
 			log.Printf("Failed to publish mock message: %v", err)
 		} else {

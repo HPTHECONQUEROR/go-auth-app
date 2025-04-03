@@ -7,7 +7,6 @@ import (
 	"go-auth-app/internal/repository"
 	"go-auth-app/pkg"
 
-
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,7 +17,6 @@ type AuthUsecase struct {
 func NewAuthUsecase(userRepo repository.UserRepository) *AuthUsecase {
 	return &AuthUsecase{UserRepo: userRepo}
 }
-
 
 //Signup-handler
 func (uc *AuthUsecase) Signup(ctx context.Context, user *domain.User) error {
@@ -41,23 +39,20 @@ func (uc *AuthUsecase) Signup(ctx context.Context, user *domain.User) error {
 }
 
 //Login-authenticates a user and returns a JWT token
-func (uc *AuthUsecase) Login(ctx context.Context, email,password string)(string,error){
+func (uc *AuthUsecase) Login(ctx context.Context, email, password string) (string, error) {
 	user, err := uc.UserRepo.GetByEmail(ctx, email)
-	
-	
 
-
-	if err != nil{
+	if err != nil {
 		return "", errors.New("invalid Email or password")
 	}
 
-	if err  := bcrypt.CompareHashAndPassword([]byte(user.Password),[]byte(password)); err != nil{
-		return "",errors.New("Invalid Email or password")
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+		return "", errors.New("Invalid Email or password")
 	}
 
-	token,err := pkg.GenerateJWT(user.ID, user.Email)
-	if err != nil{
-		return "",err
+	token, err := pkg.GenerateJWT(user.ID, user.Email)
+	if err != nil {
+		return "", err
 	}
 
 	return token, nil

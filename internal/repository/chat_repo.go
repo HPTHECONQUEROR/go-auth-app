@@ -31,7 +31,7 @@ func (r *chatRepo) SaveMessage(ctx context.Context, message *domain.Message) err
 		VALUES ($1, $2, $3, $4)
 		RETURNING id
 	`
-	
+
 	now := time.Now()
 	err := db.DB.QueryRow(
 		ctx,
@@ -41,13 +41,13 @@ func (r *chatRepo) SaveMessage(ctx context.Context, message *domain.Message) err
 		message.Content,
 		now,
 	).Scan(&message.ID)
-	
+
 	if err != nil {
 		return err
 	}
-	
+
 	message.CreatedAt = now
-	
+
 	return nil
 }
 
@@ -60,13 +60,13 @@ func (r *chatRepo) GetMessagesByConversation(ctx context.Context, user1ID, user2
 		ORDER BY created_at DESC
 		LIMIT $3 OFFSET $4
 	`
-	
+
 	rows, err := db.DB.Query(ctx, query, user1ID, user2ID, limit, offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	
+
 	messages := []*domain.Message{}
 	for rows.Next() {
 		msg := &domain.Message{}
@@ -82,11 +82,11 @@ func (r *chatRepo) GetMessagesByConversation(ctx context.Context, user1ID, user2
 		}
 		messages = append(messages, msg)
 	}
-	
+
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
-	
+
 	return messages, nil
 }
 
@@ -98,7 +98,7 @@ func (r *chatRepo) GetOrCreateConversation(ctx context.Context, user1ID, user2ID
 		FROM conversations
 		WHERE (user1_id = $1 AND user2_id = $2) OR (user1_id = $2 AND user2_id = $1)
 	`
-	
+
 	conversation := &domain.Conversation{}
 	err := db.DB.QueryRow(ctx, query, user1ID, user2ID).Scan(
 		&conversation.ID,
@@ -107,7 +107,7 @@ func (r *chatRepo) GetOrCreateConversation(ctx context.Context, user1ID, user2ID
 		&conversation.LastMessage,
 		&conversation.UpdatedAt,
 	)
-	
+
 	if err != nil {
 		// If not found, create a new conversation
 		createQuery := `
@@ -115,7 +115,7 @@ func (r *chatRepo) GetOrCreateConversation(ctx context.Context, user1ID, user2ID
 			VALUES ($1, $2, $3, $4)
 			RETURNING id
 		`
-		
+
 		now := time.Now()
 		err = db.DB.QueryRow(
 			ctx,
@@ -125,17 +125,17 @@ func (r *chatRepo) GetOrCreateConversation(ctx context.Context, user1ID, user2ID
 			"",
 			now,
 		).Scan(&conversation.ID)
-		
+
 		if err != nil {
 			return nil, err
 		}
-		
+
 		conversation.User1ID = user1ID
 		conversation.User2ID = user2ID
 		conversation.LastMessage = ""
 		conversation.UpdatedAt = now
 	}
-	
+
 	return conversation, nil
 }
 
@@ -147,13 +147,13 @@ func (r *chatRepo) GetConversationsByUserID(ctx context.Context, userID int) ([]
 		WHERE user1_id = $1 OR user2_id = $1
 		ORDER BY updated_at DESC
 	`
-	
+
 	rows, err := db.DB.Query(ctx, query, userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	
+
 	conversations := []*domain.Conversation{}
 	for rows.Next() {
 		conv := &domain.Conversation{}
@@ -169,11 +169,11 @@ func (r *chatRepo) GetConversationsByUserID(ctx context.Context, userID int) ([]
 		}
 		conversations = append(conversations, conv)
 	}
-	
+
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
-	
+
 	return conversations, nil
 }
 
@@ -184,7 +184,7 @@ func (r *chatRepo) UpdateConversation(ctx context.Context, conversationID int, l
 		SET last_message = $1, updated_at = $2
 		WHERE id = $3
 	`
-	
+
 	_, err := db.DB.Exec(ctx, query, lastMessage, time.Now(), conversationID)
 	return err
 }

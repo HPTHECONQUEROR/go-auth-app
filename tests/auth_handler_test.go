@@ -112,7 +112,7 @@ func setupTestRouter() (*gin.Engine, *MockUserRepository, *MockChatRepository, *
 	// Create handlers
 	authHandler := delivery.NewAuthHandler(authUsecase)
 	chatHandler := delivery.NewChatHandler(chatUsecase)
-	
+
 	// Setup routes
 	routes.SetupRoutes(router, authHandler, chatHandler, nil)
 

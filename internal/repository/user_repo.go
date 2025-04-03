@@ -2,8 +2,8 @@ package repository
 
 import (
 	"context"
-	"go-auth-app/internal/domain"
 	"go-auth-app/db"
+	"go-auth-app/internal/domain"
 )
 
 // UserRepository defines the interface for user operations

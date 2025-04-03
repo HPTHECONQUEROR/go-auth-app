@@ -1,8 +1,8 @@
 package delivery
 
 import (
-	"fmt"
 	"context"
+	"fmt"
 	"go-auth-app/internal/domain"
 	"go-auth-app/internal/usecase"
 	"net/http"
@@ -20,39 +20,38 @@ func NewAuthHandler(authUsecase *usecase.AuthUsecase) *AuthHandler {
 
 //signup-handler
 func (h *AuthHandler) SignupHandler(c *gin.Context) {
-    var user domain.User
+	var user domain.User
 
-    if err := c.ShouldBindJSON(&user); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input", "details": err.Error()})
-        return
-    }
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input", "details": err.Error()})
+		return
+	}
 
-    fmt.Printf("Received User: %+v\n", user)
+	fmt.Printf("Received User: %+v\n", user)
 
-    if err := h.AuthUsecase.Signup(context.Background(), &user); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
+	if err := h.AuthUsecase.Signup(context.Background(), &user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-    c.JSON(http.StatusCreated, gin.H{"message": "User registered successfully"})
+	c.JSON(http.StatusCreated, gin.H{"message": "User registered successfully"})
 }
-
 
 //login-handler
 
-func (h *AuthHandler) LoginHandler(c *gin.Context){
-    var req struct{
-        Email string `json:"email"`
-        Password string `json:"password`
-    }
+func (h *AuthHandler) LoginHandler(c *gin.Context) {
+	var req struct {
+		Email    string `json:"email"`
+		Password string `json:"password`
+	}
 
-    if err := c.ShouldBindJSON(&req); err != nil{
-        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})  
-    
-        return
-    }
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 
-    token, err := h.AuthUsecase.Login(context.Background(), req.Email, req.Password)
+		return
+	}
+
+	token, err := h.AuthUsecase.Login(context.Background(), req.Email, req.Password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
@@ -62,13 +61,12 @@ func (h *AuthHandler) LoginHandler(c *gin.Context){
 
 }
 
-
-func(h *AuthHandler) ProtectedHandler(c *gin.Context){
-    userID := c.GetInt("id")
-    email := c.GetString("email")
-    c.JSON(http.StatusOK, gin.H{
-        "message":"Protected Data",
-        "user_id":userID,
-        "email":email,
-    })
+func (h *AuthHandler) ProtectedHandler(c *gin.Context) {
+	userID := c.GetInt("id")
+	email := c.GetString("email")
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Protected Data",
+		"user_id": userID,
+		"email":   email,
+	})
 }

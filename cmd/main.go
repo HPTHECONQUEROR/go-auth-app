@@ -37,7 +37,7 @@ func main() {
 
 	// Initialize NATS service
 	natsService := service.NewNATSService(natsClient)
-	
+
 	// Generate mock data for testing NATS
 	// natsService.MockChatData()
 
@@ -56,17 +56,17 @@ func main() {
 
 	// Initialize and configure router
 	router := gin.Default()
-	
+
 	// Setup middleware
 	router.Use(delivery.ErrorHandlerMiddleware())
-	
+
 	// Setup routes
-	
+
 	routes.SetupRoutes(router, authHandler, chatHandler, wsHandler)
-	
+
 	// Log server startup
 	log.Printf("Starting server on port %s", cfg.Port)
-	
+
 	// Start server
 	router.Run(":" + cfg.Port)
 }

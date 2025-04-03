@@ -10,36 +10,33 @@ import (
 
 // ErrorResponse function defines the standard error response structure
 
-type ErrorResponse struct{
+type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
-
 //ErrorHandlerMiddleware Fucntion handles error globally
 
-func ErrorHandlerMiddleware() gin.HandlerFunc{
-	return func (c *gin.Context)  {
+func ErrorHandlerMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
 		c.Next()
 
-		if len(c.Errors) > 0{
+		if len(c.Errors) > 0 {
 			err := c.Errors.Last()
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Message: err.Error()})
 			c.Abort()
 		}
-		
+
 	}
 }
 
-
-
 //AuthMiddleware Function validates the JWT token and extracts user information
 
-func AuthMiddleware() gin.HandlerFunc{
-	return func (c *gin.Context)  {
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
-		if authHeader == ""{
-			c.JSON(http.StatusUnauthorized,gin.H{
-				"error":"Authorization header is missing",
+		if authHeader == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Authorization header is missing",
 			})
 			c.Abort()
 			return
@@ -52,7 +49,7 @@ func AuthMiddleware() gin.HandlerFunc{
 			c.Abort()
 			return
 		}
-		
+
 		// Validate token
 		claims, err := pkg.ValidateJWT(tokenString)
 		if err != nil {
@@ -65,7 +62,7 @@ func AuthMiddleware() gin.HandlerFunc{
 		c.Set("email", claims["email"])
 
 		c.Next()
-		
+
 	}
 
 }

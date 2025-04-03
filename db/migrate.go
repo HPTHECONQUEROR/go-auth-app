@@ -40,13 +40,13 @@ func RunMigrations() {
 
 	// Execute migrations
 	migrations := []string{usersTable, messagesTable, conversationsTable}
-	
+
 	for _, migration := range migrations {
 		_, err := DB.Exec(context.Background(), migration)
 		if err != nil {
 			log.Fatal("Migration failed: ", err)
 		}
 	}
-	
+
 	fmt.Println("Database migrations completed successfully!")
 }
