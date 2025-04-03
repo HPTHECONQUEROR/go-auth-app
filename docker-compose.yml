@@ -8,11 +8,20 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: go_auth
+      POSTGRES_DB: go_auth_db
     ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+
+  nats:
+    image: nats:latest
+    container_name: go_auth_nats
+    restart: always
+    ports:
+      - "4222:4222"
+      - "8222:8222"  
+    command: "--jetstream"  
 
   app:
     build: .
@@ -20,6 +29,7 @@ services:
     restart: always
     depends_on:
       - db
+      - nats
     ports:
       - "8000:8000"
     environment:
@@ -29,6 +39,8 @@ services:
       DB_NAME: go_auth
       DB_PORT: 5432
       JWT_SECRET: mysecretkey
+      NATS_URL: nats://nats:4222
+      NATS_RECONNECT: "true"
     volumes:
       - .:/app
 
