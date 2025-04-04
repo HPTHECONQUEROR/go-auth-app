@@ -1,11 +1,13 @@
 package delivery
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	"go-auth-app/pkg"
+
+	"github.com/gin-gonic/gin"
 )
 
 // ErrorResponse function defines the standard error response structure
@@ -41,6 +43,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		fmt.Println(authHeader)
 
 		// Extract token (format: "Bearer <token>")
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")

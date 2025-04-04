@@ -7,12 +7,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/crypto/bcrypt"
-
 	"go-auth-app/internal/delivery"
 	"go-auth-app/internal/domain"
 	"go-auth-app/internal/routes"
@@ -206,3 +204,4 @@ func TestProtectedRoute(t *testing.T) {
 	// Assert response
 	assert.Equal(t, http.StatusOK, w.Code)
 }
+

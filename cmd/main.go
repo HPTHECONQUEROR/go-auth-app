@@ -10,13 +10,16 @@ import (
 	"go-auth-app/internal/usecase"
 	"go-auth-app/pkg"
 	"log"
-
+	// "os/exec"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	// Load Config
 	config.LoadEnv()
+
+	// nats_file := "nats-server.exe"
+	// exec.Command(nats_file)
 
 	// Initialize config
 	cfg := config.LoadConfig()
@@ -28,12 +31,16 @@ func main() {
 	// Run database migrations
 	db.RunMigrations()
 
+	
+
 	// Initialize NATS client
 	natsClient, err := pkg.NewNatsClient(cfg.NatsURL, cfg.NatsReconnect)
 	if err != nil {
 		log.Fatalf("Failed to connect to NATS: %v", err)
 	}
 	defer natsClient.Close()
+
+
 
 	// Initialize NATS service
 	natsService := service.NewNATSService(natsClient)
