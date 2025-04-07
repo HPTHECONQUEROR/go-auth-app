@@ -70,3 +70,26 @@ func (n *NatsClient) Publish(subject string, data []byte) error {
 
 	return n.Conn.Publish(subject, data)
 }
+
+// IsConnected checks if the client is currently connected to NATS
+func (n *NatsClient) IsConnected() bool {
+	return n.Conn != nil && n.Conn.IsConnected()
+}
+
+// Subscribe wraps the NATS subscription process
+func (n *NatsClient) Subscribe(subject string, cb nats.MsgHandler) (*nats.Subscription, error) {
+	if n.Conn == nil {
+		return nil, fmt.Errorf("not connected to NATS")
+	}
+	
+	return n.Conn.Subscribe(subject, cb)
+}
+
+// Unsubscribe handles unsubscribing from a NATS subscription
+func (n *NatsClient) Unsubscribe(sub *nats.Subscription) error {
+	if sub == nil {
+		return fmt.Errorf("subscription is nil")
+	}
+	
+	return sub.Unsubscribe()
+}

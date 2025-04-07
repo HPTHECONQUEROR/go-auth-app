@@ -52,3 +52,20 @@ func (h *NATSHandler) SimulateSNMPMetricsHandler(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"metrics": metrics})
 }
+
+// GetTopicMetricsHandler returns the latest metrics for a specific topic
+func (h *NATSHandler) GetTopicMetricsHandler(c *gin.Context) {
+	topic := c.Param("topic")
+	if topic == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "topic parameter is required"})
+		return
+	}
+	
+	metrics, err := h.NATSUsecase.GetLatestMetrics(topic)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	
+	c.JSON(http.StatusOK, gin.H{"topic": topic, "metrics": metrics})
+}

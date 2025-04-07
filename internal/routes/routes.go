@@ -26,11 +26,13 @@ func SetupRoutes(
 		chat.GET("/ws", wsHandler.HandleWebSocket)
 	}
 
-	// New NATS and SNMP routes
+	// NATS and SNMP routes
 	nats := router.Group("/nats")
 	{
 		nats.GET("/topics", natsHandler.GetTopicsHandler)
 		nats.POST("/publish", natsHandler.PublishTestHandler)
+		// New endpoint to subscribe and get metrics from a specific topic
+		nats.GET("/subscribe/:topic", natsHandler.GetTopicMetricsHandler)
 	}
 
 	snmp := router.Group("/snmp")

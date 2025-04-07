@@ -6,7 +6,6 @@ import (
 	"go-auth-app/internal/domain"
 	"go-auth-app/pkg"
 	"log"
-	// "strconv"
 	"strings"
 	"time"
 
@@ -147,7 +146,7 @@ func (s *NATSService) handleChatMessage(msg *nats.Msg, userID int, callback func
 // UnsubscribeAll unsubscribes from all subscriptions
 func (s *NATSService) UnsubscribeAll() {
 	for key, sub := range s.Subscriptions {
-		if err := s.Client.Unsubscribe(sub); err != nil {
+		if err := sub.Unsubscribe(); err != nil {
 			log.Printf("Failed to unsubscribe from %s: %v", key, err)
 		}
 	}
