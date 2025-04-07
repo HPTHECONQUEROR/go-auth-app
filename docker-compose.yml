@@ -21,7 +21,7 @@ services:
     ports:
       - "4222:4222"
       - "8222:8222"  
-    command: "--jetstream"  
+    command: "--jetstream"
 
   snmp-simulator:
     image: tandrup/snmpsim
@@ -33,8 +33,6 @@ services:
       - ./snmp/data:/usr/local/snmpsim/data
     environment:
       - SNMPSIM_ARGS=--data-dir=/usr/local/snmpsim/data --agent-udpv4-endpoint=0.0.0.0:161
-    depends_on:
-      - nats  
 
   app:
     build: .
@@ -55,12 +53,6 @@ services:
       JWT_SECRET: mysecretkey
       NATS_URL: nats://nats:4222
       NATS_RECONNECT: "true"
-      SNMP_HOST: snmp-simulator
-      SNMP_PORT: "161"
-      SNMP_COMMUNITY: "public"
-      SNMP_INTERVAL: "30"
-    volumes:
-      - .:/app
 
 volumes:
   db_data:

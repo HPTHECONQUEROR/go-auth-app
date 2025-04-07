@@ -19,10 +19,6 @@ type Config struct {
 	JWTExpiration string
 	NatsURL       string
 	NatsReconnect bool
-	SNMPHost      string
-	SNMPPort      string
-	SNMPCommunity string
-	SNMPInterval  string
 }
 
 func LoadEnv() {
@@ -35,17 +31,6 @@ func LoadEnv() {
 func Getenv(key, fallback string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
-	}
-	return fallback
-}
-
-func GetenvBool(key string, fallback bool) bool {
-	if value, exists := os.LookupEnv(key); exists {
-		boolValue, err := strconv.ParseBool(value)
-		if err != nil {
-			return fallback
-		}
-		return boolValue
 	}
 	return fallback
 }
@@ -68,9 +53,16 @@ func LoadConfig() *Config {
 		JWTExpiration: Getenv("JWT_EXPIRATION_HOURS", "24"),
 		NatsURL:       Getenv("NATS_URL", "nats://localhost:4222"),
 		NatsReconnect: GetenvBool("NATS_RECONNECT", true),
-		SNMPHost:      Getenv("SNMP_HOST", "localhost"),
-		SNMPPort:      Getenv("SNMP_PORT", "161"),
-		SNMPCommunity: Getenv("SNMP_COMMUNITY", "public"),
-		SNMPInterval:  Getenv("SNMP_INTERVAL", "30"),
 	}
+}
+
+func GetenvBool(key string, fallback bool) bool {
+	if value, exists := os.LookupEnv(key); exists {
+		boolValue, err := strconv.ParseBool(value)
+		if err != nil {
+			return fallback
+		}
+		return boolValue
+	}
+	return fallback
 }
