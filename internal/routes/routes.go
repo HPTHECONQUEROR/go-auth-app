@@ -6,7 +6,7 @@ import (
 )
 
 // SetupRoutes defines API routes
-func SetupRoutes(router *gin.Engine, authHandler *delivery.AuthHandler, chatHandler *delivery.ChatHandler, wsHandler *delivery.WebSocketHandler) {
+func SetupRoutes(router *gin.Engine, authHandler *delivery.AuthHandler, chatHandler *delivery.ChatHandler, wsHandler *delivery.WebSocketHandler, metricsHandler *delivery.MetricsHandler) {
 	// Public Routes
 	router.POST("/signup", authHandler.SignupHandler)
 	router.POST("/login", authHandler.LoginHandler)
@@ -29,5 +29,19 @@ func SetupRoutes(router *gin.Engine, authHandler *delivery.AuthHandler, chatHand
 
 		// WebSocket endpoint for real-time chat
 		chat.GET("/ws", wsHandler.HandleWebSocket)
+	}
+
+	// Metrics Routes
+	metrics := router.Group("/monitoring")
+	metrics.Use(delivery.AuthMiddleware())
+	{
+		// Get latest metrics
+		metrics.GET("/metrics", metricsHandler.GetLatestMetricsHandler)
+		
+		// Get metrics by time range
+		metrics.GET("/metrics/range", metricsHandler.GetMetricsByRangeHandler)
+		
+		// Get metrics summary
+		metrics.GET("/metrics/summary", metricsHandler.GetMetricsSummaryHandler)
 	}
 }

@@ -23,6 +23,19 @@ services:
       - "8222:8222"  
     command: "--jetstream"  
 
+  snmp-simulator:
+    image: tandrup/snmpsim
+    container_name: go_auth_snmp_simulator
+    restart: always
+    ports:
+      - "161:161/udp"
+    volumes:
+      - ./snmp/data:/usr/local/snmpsim/data
+    environment:
+      - SNMPSIM_ARGS=--data-dir=/usr/local/snmpsim/data --agent-udpv4-endpoint=0.0.0.0:161
+    depends_on:
+      - nats  
+
   app:
     build: .
     container_name: go_auth_app
@@ -30,17 +43,22 @@ services:
     depends_on:
       - db
       - nats
+      - snmp-simulator
     ports:
       - "8000:8000"
     environment:
       DB_HOST: db
       DB_USER: postgres
-      DB_PASSWORD: password
+      DB_PASSWORD: 8056
       DB_NAME: go_auth_db
       DB_PORT: 5432
       JWT_SECRET: mysecretkey
       NATS_URL: nats://nats:4222
       NATS_RECONNECT: "true"
+      SNMP_HOST: snmp-simulator
+      SNMP_PORT: "161"
+      SNMP_COMMUNITY: "public"
+      SNMP_INTERVAL: "30"
     volumes:
       - .:/app
 

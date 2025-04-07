@@ -19,6 +19,10 @@ type Config struct {
 	JWTExpiration string
 	NatsURL       string
 	NatsReconnect bool
+	SNMPHost      string
+	SNMPPort      string
+	SNMPCommunity string
+	SNMPInterval  string
 }
 
 func LoadEnv() {
@@ -57,12 +61,16 @@ func LoadConfig() *Config {
 		DBHost:        Getenv("DB_HOST", "localhost"),
 		DBPort:        Getenv("DB_PORT", "5432"),
 		DBUser:        Getenv("DB_USER", "postgres"),
-		DBPassword:    Getenv("DB_PASSWORD", "password"),
+		DBPassword:    Getenv("DB_PASSWORD", "8056"),
 		DBName:        Getenv("DB_NAME", "go_auth_db"),
 		DBSSLMode:     Getenv("DB_SSLMODE", "disable"),
 		JWTSecret:     Getenv("JWT_SECRET", "default_jwt_secret_key"),
 		JWTExpiration: Getenv("JWT_EXPIRATION_HOURS", "24"),
 		NatsURL:       Getenv("NATS_URL", "nats://localhost:4222"),
 		NatsReconnect: GetenvBool("NATS_RECONNECT", true),
+		SNMPHost:      Getenv("SNMP_HOST", "localhost"),
+		SNMPPort:      Getenv("SNMP_PORT", "161"),
+		SNMPCommunity: Getenv("SNMP_COMMUNITY", "public"),
+		SNMPInterval:  Getenv("SNMP_INTERVAL", "30"),
 	}
 }

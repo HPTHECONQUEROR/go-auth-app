@@ -38,8 +38,31 @@ func RunMigrations() {
 	);
 	`
 
+	snmpMetricsTable := `
+	CREATE TABLE IF NOT EXISTS snmp_metrics (
+		id SERIAL PRIMARY KEY,
+		device_id VARCHAR(100) NOT NULL,
+		timestamp TIMESTAMP NOT NULL,
+		device_name VARCHAR(255),
+		device_description TEXT,
+		device_uptime VARCHAR(255),
+		cpu_load INTEGER,
+		memory_total BIGINT,
+		in_octets BIGINT,
+		out_octets BIGINT,
+		in_errors INTEGER,
+		out_errors INTEGER,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	);
+	`
+
+	// Create index on timestamp for faster queries
+	metricsIndex := `
+	CREATE INDEX IF NOT EXISTS idx_snmp_metrics_timestamp ON snmp_metrics (timestamp);
+	`
+
 	// Execute migrations
-	migrations := []string{usersTable, messagesTable, conversationsTable}
+	migrations := []string{usersTable, messagesTable, conversationsTable, snmpMetricsTable, metricsIndex}
 
 	for _, migration := range migrations {
 		_, err := DB.Exec(context.Background(), migration)
