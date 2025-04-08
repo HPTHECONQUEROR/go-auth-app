@@ -19,7 +19,7 @@ func NewAuthHandler(authUsecase *usecase.AuthUsecase) *AuthHandler {
 	return &AuthHandler{AuthUsecase: authUsecase}
 }
 
-//signup-handler
+// signup-handler
 func (h *AuthHandler) SignupHandler(c *gin.Context) {
 	var user domain.User
 
@@ -50,7 +50,7 @@ func (h *AuthHandler) SignupHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "User registered successfully"})
 }
 
-//login-handler
+// login-handler
 func (h *AuthHandler) LoginHandler(c *gin.Context) {
 	var req struct {
 		Email    string `json:"email"`
@@ -91,7 +91,6 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }
-
 
 func (h *AuthHandler) ProtectedHandler(c *gin.Context) {
 	userID := c.GetInt("id")

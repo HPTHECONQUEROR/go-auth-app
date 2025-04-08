@@ -18,7 +18,7 @@ func NewAuthUsecase(userRepo repository.UserRepository) *AuthUsecase {
 	return &AuthUsecase{UserRepo: userRepo}
 }
 
-//Signup-handler
+// Signup-handler
 func (uc *AuthUsecase) Signup(ctx context.Context, user *domain.User) error {
 	if err := user.Validate(); err != nil {
 		return err
@@ -38,7 +38,7 @@ func (uc *AuthUsecase) Signup(ctx context.Context, user *domain.User) error {
 	return uc.UserRepo.Create(ctx, user)
 }
 
-//Login-authenticates a user and returns a JWT token
+// Login-authenticates a user and returns a JWT token
 func (uc *AuthUsecase) Login(ctx context.Context, email, password string) (string, error) {
 	user, err := uc.UserRepo.GetByEmail(ctx, email)
 

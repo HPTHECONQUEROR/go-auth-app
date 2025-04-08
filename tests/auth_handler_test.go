@@ -4,18 +4,18 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"golang.org/x/crypto/bcrypt"
 	"go-auth-app/internal/delivery"
 	"go-auth-app/internal/domain"
 	"go-auth-app/internal/routes"
 	"go-auth-app/internal/usecase"
 	"go-auth-app/pkg"
+	"golang.org/x/crypto/bcrypt"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 )
 
 // Mock repositories
@@ -112,7 +112,7 @@ func setupTestRouter() (*gin.Engine, *MockUserRepository, *MockChatRepository, *
 	chatHandler := delivery.NewChatHandler(chatUsecase)
 
 	// Setup routes
-	routes.SetupRoutes(router, authHandler, chatHandler, nil)
+	routes.SetupRoutes(router, authHandler, chatHandler, nil, nil)
 
 	return router, mockUserRepo, mockChatRepo, mockNATSService
 }
@@ -204,4 +204,3 @@ func TestProtectedRoute(t *testing.T) {
 	// Assert response
 	assert.Equal(t, http.StatusOK, w.Code)
 }
-

@@ -36,7 +36,7 @@ func (n *NatsClient) Connect() error {
 	}
 
 	if n.Reconnect {
-		opts = append(opts, 
+		opts = append(opts,
 			nats.DisconnectErrHandler(func(nc *nats.Conn, err error) {
 				log.Printf("NATS disconnected: %v", err)
 			}),
@@ -81,7 +81,7 @@ func (n *NatsClient) Subscribe(subject string, cb nats.MsgHandler) (*nats.Subscr
 	if n.Conn == nil {
 		return nil, fmt.Errorf("not connected to NATS")
 	}
-	
+
 	return n.Conn.Subscribe(subject, cb)
 }
 
@@ -90,6 +90,6 @@ func (n *NatsClient) Unsubscribe(sub *nats.Subscription) error {
 	if sub == nil {
 		return fmt.Errorf("subscription is nil")
 	}
-	
+
 	return sub.Unsubscribe()
 }

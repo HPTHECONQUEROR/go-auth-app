@@ -6,9 +6,9 @@ import (
 )
 
 func SetupRoutes(
-	router *gin.Engine, 
-	authHandler *delivery.AuthHandler, 
-	chatHandler *delivery.ChatHandler, 
+	router *gin.Engine,
+	authHandler *delivery.AuthHandler,
+	chatHandler *delivery.ChatHandler,
 	wsHandler *delivery.WebSocketHandler,
 	natsHandler *delivery.NATSHandler,
 ) {

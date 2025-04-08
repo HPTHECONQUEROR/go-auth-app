@@ -1,15 +1,15 @@
 package tests
 
 import (
-	"net/http/httptest"
-	"strings"
-	"testing"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/stretchr/testify/assert"
 	"go-auth-app/internal/delivery"
 	"go-auth-app/internal/routes"
 	"go-auth-app/internal/usecase"
+	"net/http/httptest"
+	"strings"
+	"testing"
 )
 
 // setupWebSocketTestRouter creates a test router specifically for WebSocket tests
@@ -31,7 +31,7 @@ func setupWebSocketTestRouter() (*gin.Engine, *MockUserRepository, *MockChatRepo
 	wsHandler := delivery.NewWebSocketHandler(chatUsecase, nil)
 
 	// Setup routes
-	routes.SetupRoutes(router, authHandler, chatHandler, wsHandler)
+	routes.SetupRoutes(router, authHandler, chatHandler, wsHandler, nil)
 
 	// Create test server
 	server := httptest.NewServer(router)
@@ -50,4 +50,3 @@ func TestWebSocketAuthRequired(t *testing.T) {
 	// Connection should fail due to authentication failure
 	assert.Error(t, err)
 }
-
